@@ -1,5 +1,5 @@
 // index.js - purpose and description here
-// Author: Your Name
+// Author: Jacob Ganburged
 // Date:
 
 // make sure document is ready
