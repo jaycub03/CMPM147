@@ -11,6 +11,10 @@
 
 /* global generateGrid drawGrid */
 
+/* exported preload, setup, draw, placeTile */
+
+/* global generateGrid drawGrid */
+
 let seed = 0;
 let tilesetImage;
 let currentGrid = [];

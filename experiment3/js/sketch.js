@@ -1,79 +1,127 @@
-// sketch.js - purpose and description here
-// Author: Your Name
-// Date:
+// project.js - dungeon/overworld
+// Author: Jacob ganburged
+// Date: 4/24/24
 
-// Here is how you might set up an OOP p5.js project
-// Note that p5.js looks for a file called sketch.js
 
-// Constants - User-servicable parts
-// In a longer project I like to put these in a separate file
-const VALUE1 = 1;
-const VALUE2 = 2;
 
-// Globals
-let myInstance;
-let canvasContainer;
-var centerHorz, centerVert;
+/* exported generateGrid, drawGrid */
+/* global placeTile*/
 
-class MyClass {
-    constructor(param1, param2) {
-        this.property1 = param1;
-        this.property2 = param2;
+let lastToggleTime = 0;
+let useAlternate = false;
+
+function generateGrid(numCols, numRows) {
+  let grid = [];
+  let rooms = [];
+  
+  // Initialize all cells as walls
+  for (let i = 0; i < numRows; i++) {
+    grid.push(new Array(numCols).fill('W'));
+  }
+
+  // Generate 2 rooms so that they arent next to each other
+  for (let n = 0; n < 2; n++) {
+    let room;
+    do {
+      let roomWidth = floor(random(4, 8));
+      let roomHeight = floor(random(4, 8));
+      let roomX = floor(random(1, numCols - roomWidth - 1));
+      let roomY = floor(random(1, numRows - roomHeight - 1));
+  
+      //creates room object
+      room = {
+        x: roomX,
+        y: roomY,
+        width: roomWidth,
+        height: roomHeight
+      };
+    } while (!isValidRoom(room, rooms));
+
+    rooms.push(room);
+    // replace floors with .
+    for (let y = room.y; y < room.y + room.height; y++) {
+      for (let x = room.x; x < room.x + room.width; x++) {
+        grid[y][x] = '.';
+      }
     }
+  }
 
-    myMethod() {
-        // code to run when method is called
+  // Connect the 2 rooms with corridors
+  connectRooms(rooms[0], rooms[1], grid);
+
+  // Place chests in rooms
+  placeChests(rooms, grid);
+
+  return grid;
+}
+ 
+//checks to see if room is overlapping or too close
+function isValidRoom(newRoom, existingRooms) {
+  const buffer = 3; // Minimum distance between rooms
+  for (const room of existingRooms) {
+    if (newRoom.x < room.x + room.width + buffer &&
+        newRoom.x + newRoom.width + buffer > room.x &&
+        newRoom.y < room.y + room.height + buffer &&
+        newRoom.y + newRoom.height + buffer > room.y) {
+      return false; 
     }
+  }
+  return true;
 }
 
-function resizeScreen() {
-  centerHorz = canvasContainer.width() / 2; // Adjusted for drawing logic
-  centerVert = canvasContainer.height() / 2; // Adjusted for drawing logic
-  console.log("Resizing...");
-  resizeCanvas(canvasContainer.width(), canvasContainer.height());
-  // redrawCanvas(); // Redraw everything based on new size
+//connects 2 rooms 
+function connectRooms(room1, room2, grid) {
+  let xStart = room1.x + Math.floor(room1.width / 2);
+  let yStart = room1.y + Math.floor(room1.height / 2);
+  let xEnd = room2.x + Math.floor(room2.width / 2);
+  let yEnd = room2.y + Math.floor(room2.height / 2);
+
+  // Create a horizontal corridor
+  for (let x = Math.min(xStart, xEnd); x <= Math.max(xStart, xEnd); x++) {
+    grid[yStart][x] = '-';
+  }
+
+  // Create a vertical corridor
+  for (let y = Math.min(yStart, yEnd); y <= Math.max(yStart, yEnd); y++) {
+    grid[y][xEnd] = '-';
+  }
 }
 
-// setup() function is called once when the program starts
-function setup() {
-  // place our canvas, making it fit our container
-  canvasContainer = $("#canvas-container");
-  let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
-  canvas.parent("canvas-container");
-  // resize canvas is the page is resized
-
-  // create an instance of the class
-  myInstance = new MyClass("VALUE1", "VALUE2");
-
-  $(window).resize(function() {
-    resizeScreen();
+//place chest in center of each room
+function placeChests(rooms, grid) {
+  rooms.forEach(room => {
+    let chestX = room.x + Math.floor(room.width / 2);
+    let chestY = room.y + Math.floor(room.height / 2);
+    grid[chestY][chestX] = 'C';
   });
-  resizeScreen();
 }
 
-// draw() function is called repeatedly, it's the main animation loop
-function draw() {
-  background(220);    
-  // call a method on the instance
-  myInstance.myMethod();
+function drawGrid(grid) {
+  // Background is typically set within draw functions in p5.js
+  background(128);
 
-  // Set up rotation for the rectangle
-  push(); // Save the current drawing context
-  translate(centerHorz, centerVert); // Move the origin to the rectangle's center
-  rotate(frameCount / 100.0); // Rotate by frameCount to animate the rotation
-  fill(234, 31, 81);
-  noStroke();
-  rect(-125, -125, 250, 250); // Draw the rectangle centered on the new origin
-  pop(); // Restore the original drawing context
+  const currentTime = millis(); // Current time in milliseconds
 
-  // The text is not affected by the translate and rotate
-  fill(255);
-  textStyle(BOLD);
-  textSize(140);
-  text("p5*", centerHorz - 105, centerVert + 40);
+  if (currentTime - lastToggleTime > 3000) { // Change every 3 seconds
+    useAlternate = !useAlternate;
+    lastToggleTime = currentTime;
+  }
+
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      let tileType = grid[i][j];
+      let tile = getTile(tileType, useAlternate); 
+      placeTile(i, j, tile.x, tile.y); 
+    }
+  }
 }
-
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-    // code to run when mouse is pressed
+// returns the tiles based on each tile
+function getTile(tileType, alternate) {
+  const tiles = {
+    'W': { normal: { x: 25, y: 21 }, alternate: { x:10, y: 0} },
+    '.': { normal: { x: 1, y: 15 }, alternate: { x: 1, y: 1 } },
+    '-': { normal: { x: 2, y: 15 }, alternate: { x: 1, y: 1 } },
+    'C': { normal: { x: 2, y: 29 }, alternate: { x: 2, y: 28 } },
+  };
+  return alternate ? tiles[tileType].alternate : tiles[tileType].normal;
 }
