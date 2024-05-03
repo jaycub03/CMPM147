@@ -1,127 +1,97 @@
-// project.js - dungeon/overworld
-// Author: Jacob ganburged
-// Date: 4/24/24
+const mySketch = (sketch) => {
+  let worldSeed;
+  let selectedTiles = {};
+  let tileWidth = 32;
+  let tileHeight = 16;
+  let tileColumns, tileRows;
+  let cameraOffset;
+  let cameraVelocity;
 
-
-
-/* exported generateGrid, drawGrid */
-/* global placeTile*/
-
-let lastToggleTime = 0;
-let useAlternate = false;
-
-function generateGrid(numCols, numRows) {
-  let grid = [];
-  let rooms = [];
-  
-  // Initialize all cells as walls
-  for (let i = 0; i < numRows; i++) {
-    grid.push(new Array(numCols).fill('W'));
-  }
-
-  // Generate 2 rooms so that they arent next to each other
-  for (let n = 0; n < 2; n++) {
-    let room;
-    do {
-      let roomWidth = floor(random(4, 8));
-      let roomHeight = floor(random(4, 8));
-      let roomX = floor(random(1, numCols - roomWidth - 1));
-      let roomY = floor(random(1, numRows - roomHeight - 1));
-  
-      //creates room object
-      room = {
-        x: roomX,
-        y: roomY,
-        width: roomWidth,
-        height: roomHeight
-      };
-    } while (!isValidRoom(room, rooms));
-
-    rooms.push(room);
-    // replace floors with .
-    for (let y = room.y; y < room.y + room.height; y++) {
-      for (let x = room.x; x < room.x + room.width; x++) {
-        grid[y][x] = '.';
-      }
-    }
-  }
-
-  // Connect the 2 rooms with corridors
-  connectRooms(rooms[0], rooms[1], grid);
-
-  // Place chests in rooms
-  placeChests(rooms, grid);
-
-  return grid;
-}
- 
-//checks to see if room is overlapping or too close
-function isValidRoom(newRoom, existingRooms) {
-  const buffer = 3; // Minimum distance between rooms
-  for (const room of existingRooms) {
-    if (newRoom.x < room.x + room.width + buffer &&
-        newRoom.x + newRoom.width + buffer > room.x &&
-        newRoom.y < room.y + room.height + buffer &&
-        newRoom.y + newRoom.height + buffer > room.y) {
-      return false; 
-    }
-  }
-  return true;
-}
-
-//connects 2 rooms 
-function connectRooms(room1, room2, grid) {
-  let xStart = room1.x + Math.floor(room1.width / 2);
-  let yStart = room1.y + Math.floor(room1.height / 2);
-  let xEnd = room2.x + Math.floor(room2.width / 2);
-  let yEnd = room2.y + Math.floor(room2.height / 2);
-
-  // Create a horizontal corridor
-  for (let x = Math.min(xStart, xEnd); x <= Math.max(xStart, xEnd); x++) {
-    grid[yStart][x] = '-';
-  }
-
-  // Create a vertical corridor
-  for (let y = Math.min(yStart, yEnd); y <= Math.max(yStart, yEnd); y++) {
-    grid[y][xEnd] = '-';
-  }
-}
-
-//place chest in center of each room
-function placeChests(rooms, grid) {
-  rooms.forEach(room => {
-    let chestX = room.x + Math.floor(room.width / 2);
-    let chestY = room.y + Math.floor(room.height / 2);
-    grid[chestY][chestX] = 'C';
-  });
-}
-
-function drawGrid(grid) {
-  // Background is typically set within draw functions in p5.js
-  background(128);
-
-  const currentTime = millis(); // Current time in milliseconds
-
-  if (currentTime - lastToggleTime > 3000) { // Change every 3 seconds
-    useAlternate = !useAlternate;
-    lastToggleTime = currentTime;
-  }
-
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[i].length; j++) {
-      let tileType = grid[i][j];
-      let tile = getTile(tileType, useAlternate); 
-      placeTile(i, j, tile.x, tile.y); 
-    }
-  }
-}
-// returns the tiles based on each tile
-function getTile(tileType, alternate) {
-  const tiles = {
-    'W': { normal: { x: 25, y: 21 }, alternate: { x:10, y: 0} },
-    '.': { normal: { x: 1, y: 15 }, alternate: { x: 1, y: 1 } },
-    '-': { normal: { x: 2, y: 15 }, alternate: { x: 1, y: 1 } },
-    'C': { normal: { x: 2, y: 29 }, alternate: { x: 2, y: 28 } },
+  sketch.preload = function() {
+      // Add preload code here if necessary
   };
-  return alternate ? tiles[tileType].alternate : tiles[tileType].normal;
-}
+
+  sketch.setup = function() {
+      sketch.createCanvas(800, 400).parent("container");
+      cameraOffset = new sketch.createVector(-sketch.width / 2, sketch.height / 2);
+      cameraVelocity = new sketch.createVector(0, 0);
+
+      setupWorld("xyzzy");  // Setup with default key
+  };
+
+  function setupWorld(key) {
+      worldSeed = sketch.XXH.h32(key, 0).toNumber();
+      sketch.noiseSeed(worldSeed);
+      sketch.randomSeed(worldSeed);
+      calculateTileDimensions();
+  }
+
+  function calculateTileDimensions() {
+      tileColumns = Math.ceil(sketch.width / tileWidth);
+      tileRows = Math.ceil(sketch.height / tileHeight);
+  }
+
+  sketch.draw = function() {
+      sketch.background(100);
+      updateCamera();
+      drawTiles();
+  };
+
+  function updateCamera() {
+      if (sketch.keyIsDown(sketch.LEFT_ARROW)) cameraOffset.x += 5;
+      if (sketch.keyIsDown(sketch.RIGHT_ARROW)) cameraOffset.x -= 5;
+      if (sketch.keyIsDown(sketch.UP_ARROW)) cameraOffset.y += 5;
+      if (sketch.keyIsDown(sketch.DOWN_ARROW)) cameraOffset.y -= 5;
+  }
+
+  function drawTiles() {
+      for (let i = 0; i < tileColumns; i++) {
+          for (let j = 0; j < tileRows; j++) {
+              let x = i * tileWidth + cameraOffset.x;
+              let y = j * tileHeight + cameraOffset.y;
+              drawTile(i, j, x, y);
+          }
+      }
+  }
+
+  function drawTile(col, row, x, y) {
+      let noiseVal = sketch.noise(col / 10.0, row / 10.0);
+      if (selectedTiles[`${col},${row}`]) {
+          sketch.fill(135, 206, 235);
+      } else if (noiseVal < 0.3) {
+          sketch.fill(240, 248, 255);
+      } else if (noiseVal < 0.6) {
+          sketch.fill(176, 224, 230);
+      } else {
+          sketch.fill(205, 133, 63);
+      }
+      sketch.rect(x, y, tileWidth, tileHeight);
+  }
+
+  sketch.mouseClicked = function() {
+      let col = Math.floor((sketch.mouseX - cameraOffset.x) / tileWidth);
+      let row = Math.floor((sketch.mouseY - cameraOffset.y) / tileHeight);
+      toggleTile(col, row);
+  };
+
+  function toggleTile(col, row) {
+      let key = `${col},${row}`;
+      if (selectedTiles[key]) {
+          delete selectedTiles[key];
+      } else {
+          selectedTiles[key] = true;
+      }
+  };
+
+  function worldToScreen(x, y) {
+      return [(x - y) * tileWidth / 2 + cameraOffset.x, (x + y) * tileHeight / 2 + cameraOffset.y];
+  }
+
+  function screenToWorld(sx, sy) {
+      let x = (sx - cameraOffset.x) / (tileWidth / 2);
+      let y = (sy - cameraOffset.y) / (tileHeight / 2);
+      return [(y + x) / 2, (y - x) / 2];
+  }
+};
+
+new p5(mySketch, 'container');

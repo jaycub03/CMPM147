@@ -1,79 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<!-- This title is used for tabs and bookmarks -->
-	<title>Experiment X - Subject/Topic</title>
+    <!-- This title is used for tabs and bookmarks -->
+    <title>Experiment X - Subject/Topic</title>
 
-	<!-- Use UTF character set, a good idea with any webpage -->
-	<meta charset="UTF-8" />
-	<!-- Set viewport so page remains consistently scaled w narrow devices -->
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Use UTF character set, a good idea with any webpage -->
+    <meta charset="UTF-8" />
+    <!-- Set viewport so page remains consistently scaled w narrow devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-	<!-- Include CSS file, including a site-wide CSS and for this particular page -->
-	<link rel="stylesheet" type="text/css" href="../css/site.css">
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+    <!-- Include CSS file, including a site-wide CSS and for this particular page -->
+    <link rel="stylesheet" type="text/css" href="../css/site.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
 
-	<!-- Load jQuery library -->
-	<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-        crossorigin="anonymous"></script>
-	<!-- Load p5.js library -->
-	<script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.js"></script>
-
-	<!-- Link to javascript files - DEFER waits until all elements are rendered -->
-    <script type="text/javascript" src="../js/site.js" DEFER></script>
-	<!-- Use me for a JavaScript OOP Project -->
-	<script type="text/javascript" src="./js/project.js" DEFER></script>
-	<!-- Use me for a p5.js project -->
-	<script type="text/javascript" src="./js/sketch.js" DEFER></script>
+    <!-- Load jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <!-- Load p5.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.js"></script>
 </head>
 <body>
-	<!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
-	<main id="content">
-		<section>
-
-			<h1>Experiment 3 - Alternate World</h1>
-
-			<div class="minor-section">
-				<div id="canvas-container">
-					<!-- canvas will be added here -->
-					
-						<button id="reseedButton">
-						  reseed
-						</button>
-						<span id="seedReport"></span>
-						<hr />
-						<span id="canvasContainer" style="margin: 10px;"></span>
-						<textarea cols="20" rows="20" id="asciiBox" style="opacity: 0.5; letter-spacing: 1ex; width: 320px; margin: 10px; font-family: monospace;"></textarea>
-					  
-				</div>
+    <!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
+    <main id="content">
+        <section>
+            <h1>Experiment 3 - Alternate World</h1>
+            <div class="minor-section">
+                <div id="container">
+                    <!-- The canvas will be added here by p5.js -->
+                </div>
                 <div class="fullscreen-box">
                     <button id="fullscreen">Fullscreen</button>
                 </div>
-			</div>
-
-			<div class="minor-section">
-				<h2>Description</h2>
-				<p>So I am trying to accomplish making a dungeon and the top of the dungeon so the outer land. Also inside the dungeon there are 2 rooms with chests which open and close.</p>
-			</div>
-
-			<div class="minor-section">
-				<h2>Technical</h2>
-				<p>So there is the dungeon and then the grid and in the grid it replicates the W for walls, . for floor, C for chest and - for pathway leading to the other room. Additionally all functions are self explainable</p>
-			</div>
-
-			<div class="minor-section">
-				<h2>Reflection</h2>
-				<p>This experiment was the hardest one I have did out of the 3. I was having trouble figuring out the tiles and how to make rooms. I also wasnt able to connect it and didnt know how to make it alternate. I figured out how to make it alternate through millis function. This took me a lot of time and by far took the longest.</p>
-			</div>
-
-		</section>
-		<nav id="links" class="minor-section">
-			<!-- Put link back to homepage here. -->
+            </div>
+            <div class="minor-section">
+                <h2>Description</h2>
+                <p>Description of the project...</p>
+            </div>
+            <div class="minor-section">
+                <h2>Technical</h2>
+                <p>Technical details...</p>
+            </div>
+            <div class="minor-section">
+                <h2>Reflection</h2>
+                <p>Reflections on the project...</p>
+            </div>
+        </section>
+        <nav id="links" class="minor-section">
             <ul>
                 <li><a href="../index.html">Home</a></li>
             </ul>
-		</nav>
-	</main>
+        </nav>
+    </main>
+    <!-- JavaScript at the bottom for proper loading order -->
+    <script type="text/javascript" src="../js/site.js"></script>
+    <script type="text/javascript" src="./js/project.js"></script>
+    <script type="text/javascript" src="./js/sketch.js"></script>
 </body>
 </html>
