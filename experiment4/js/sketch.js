@@ -2,6 +2,8 @@
 // Author: Jacob ganburged
 // Date: 5/2/24
 
+//Aidan Helped me integrate it in.
+
 
 let worldSeed;
 let Gkey = "xyzzy";
@@ -596,62 +598,63 @@ const s2 = (sketch) => {
 
 
 
-// Update world seed when key is changed
+// update world seed when key is changed
 function p3_worldKeyChanged(key) {
   worldSeed = XXH.h32(key, 0).toNumber();
   sketch.randomSeed(worldSeed);
   sketch.noiseSeed(worldSeed);
 }
 
-// Return width of each tile in pixels
+// return width of each tile 
 function p3_tileWidth() {
   return 40;
 }
 
-// Return height of each tile in pixels
+// return height of each tile 
 function p3_tileHeight() {
   return 16;
 }
-// Track selected tiles
+// track selected tiles
 let selectedTiles = {};
 
-// Handles the click function, toggling their state
+// handles the click function, toggling their state
 function p3_tileClicked(i, j) {
   let key = `${i},${j}`;
   if (selectedTiles[key]) {
-    // Deselect the tile if it's already selected
+    // deselect the tile if it's already selected
     delete selectedTiles[key]; 
   } else {
-     // Select the tile
+     // select the tile
     selectedTiles[key] = true;
   }
 }
 
+//store tile width and height
 let [tw, th] = [p3_tileWidth(), p3_tileHeight()];
-// Draw each tile
+// draw each tile
 function p3_drawTile(i, j) {
   sketch.noStroke();
   let tileKey = i + "," + j;
   let noiseVal = sketch.noise(i / 128.0, j / 128.0, worldSeed);
 
-  // Check if this tile is selected
+  // check if this tile is selected
   if (selectedTiles[tileKey]) {
     //solid blue
     sketch.fill(0, 0, 255); 
   } else {
     if (noiseVal < 0.3) {
-      // Water/dark blue
+      // water/dark blue
       sketch.fill(0, 128, 0); 
     } else if (noiseVal < 0.6) {
-      // Dirt/brown
+      // dirt/brown
       sketch.fill(128, 64, 0); 
     } else {
-      // Grass/green
+      // grass/green
       sketch.fill(0, 200, 0); 
     }
   }
 
-  // Draw the tile shape
+  // draw the tile shape
   sketch.push();
   sketch.beginShape();
   sketch.vertex(-tw, 0);
@@ -662,7 +665,7 @@ function p3_drawTile(i, j) {
   sketch.pop();
 }
 
-// Displays the outline coordinates
+// displays the outline coordinates
 function p3_drawSelectedTile(i, j) {
   sketch.noFill();
   sketch.stroke(255, 255, 255, 255);
@@ -933,60 +936,61 @@ const s3 = (sketch) => {
 
 
 
-// Update world seed when key is changed
+// update world seed when key is changed
 function p3_worldKeyChanged(key) {
   worldSeed = XXH.h32(key, 0).toNumber();
   sketch.randomSeed(worldSeed);
   sketch.noiseSeed(worldSeed);
 }
 
-// Return width of each tile in pixels
+// returns width of each tile 
 function p3_tileWidth() {
   return 32;
 }
 
-// Return height of each tile in pixels
+// returns height of each tile
 function p3_tileHeight() {
   return 16;
 }
 // Track selected tiles
 let selectedTiles = {};
 
-// Handles the click function, toggling their state
+// handles the click function, toggling their state
 function p3_tileClicked(i, j) {
   let key = `${i},${j}`;
   if (selectedTiles[key]) {
-    delete selectedTiles[key]; // Deselect the tile if it's already selected
+    // deselect the tile if it's already selected 
   } else {
-    selectedTiles[key] = true; // Select the tile
+    // select the tile
+    selectedTiles[key] = true; 
   }
 }
 
 let [tw, th] = [p3_tileWidth(), p3_tileHeight()];
-// Draw each tile
+// draw each tile
 function p3_drawTile(i, j) {
   sketch.noStroke();
   let tileKey = i + "," + j;
   let noiseVal = sketch.noise(i / 128.0, j / 128.0, worldSeed);
 
-  // Check if this tile is selected
+  // check if this tile is selected
   if (selectedTiles[tileKey]) {
     //light blue
     sketch.fill(135, 206, 235); 
   } else {
     if (noiseVal < 0.3) {
-      // // Snow
+      // // snow
       sketch.fill(240, 248, 255); 
     } else if (noiseVal < 0.6) {
-      // Ice
+      // ice
       sketch.fill(176, 224, 230); 
     } else {
-      // Frozen earth
+      // frozen earth
       sketch.fill(205, 133, 63); 
     }
   }
 
-  // Draw the tile shape
+  // draw the tile shape
   sketch.push();
   sketch.beginShape();
   sketch.vertex(-tw, 0);
@@ -997,7 +1001,7 @@ function p3_drawTile(i, j) {
   sketch.pop();
 }
 
-// Displays the outline coordinates
+// displays the outline coordinates
 function p3_drawSelectedTile(i, j) {
   sketch.noFill();
   sketch.stroke(255, 255, 255, 255);
